@@ -1,0 +1,11 @@
+{
+  "abs_error": 6.159772395104499e-05,
+  "exact_float": 0.030476190476190476,
+  "exact_fraction": "16/525",
+  "mc_mean": 0.03053778820014152,
+  "mc_sem": 4.92648409005689e-05,
+  "n_samples": 500000,
+  "passed": true,
+  "seed": 0,
+  "tolerance": 0.003
+}

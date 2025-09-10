@@ -1,0 +1,16 @@
+{
+  "all_passed": true,
+  "axis_error": 2.7755575615628914e-16,
+  "constant_for_Q": 0.014102564102564103,
+  "n_random": 2000,
+  "passed_axis": true,
+  "passed_random": true,
+  "passed_scaled": true,
+  "ratio_axis": 0.4999999999999997,
+  "ratio_max_error": 2.9343194540842887e-13,
+  "ratio_mean": 0.5000000000000004,
+  "ratio_std": 1.2101277738842022e-14,
+  "seed": 0,
+  "target_constant_for_Q": 0.014102564102564103,
+  "tol": 1e-12
+}

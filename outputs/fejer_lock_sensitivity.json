@@ -1,0 +1,39 @@
+{
+  "ALL_PASSED": true,
+  "L_eff (final)": 0.6358598659958836,
+  "L_eff (no quad)": 0.6358598629243455,
+  "deltaL2_propagation_on_alpha": {
+    "abs_err": 3.307036069274477e-15,
+    "alpha_final": 137.0359991762865,
+    "alpha_noquad": 137.0359998606429,
+    "delta_alpha_actual": -6.843564089358754e-07,
+    "delta_alpha_predicted": -6.843564122429115e-07,
+    "pass": true,
+    "rel_err": 4.8323300930529435e-09
+  },
+  "derivatives": {
+    "d_alpha_inv_dL": {
+      "abs_err": 5.512717509475242e-16,
+      "analytic": -222.80576556824226,
+      "fd": -222.80576556824226,
+      "pass": true,
+      "rel_err": 2.4742256985207027e-18
+    },
+    "d_mr_dL": {
+      "abs_err": 2.5125931993841764e-23,
+      "analytic": 0.05442276869866126,
+      "fd": 0.05442276869866126,
+      "pass": true,
+      "rel_err": 4.616805170821792e-22
+    }
+  },
+  "dps": 120,
+  "h": 1e-09,
+  "kappa_infty": 0.49926851200153,
+  "m": 19,
+  "notes": [
+    "Analytic: d/dL \u03b1^{-1} = -2 \u03ba_\u221e e^{2L/m} / (e^{2L/m}-1)^2;  d/dL m_r = m_r / m.",
+    "Propagation check evaluates derivative at L_noquad times \u0394L^(2) and compares to actual \u03b1^{-1} shift."
+  ],
+  "\u0394L^(2)": 3.0715381349466497e-09
+}
