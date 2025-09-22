@@ -1,0 +1,57 @@
+{
+  "inputs": {
+    "n_random": {
+      "value": 1000
+    },
+    "seed": {
+      "value": 0
+    },
+    "sf": {
+      "value": 1.0
+    },
+    "tol": {
+      "value": 1e-12
+    }
+  },
+  "intermediates": {
+    "abs_err_bound": "2.93765012315816420596093e-13",
+    "axis_dev": "6.10622663543836097232997e-16",
+    "axis_ratio": "0.499999999999999722444244",
+    "random_max_dev": "2.93765012315816420596093e-13",
+    "random_mean": "0.500000000000000333066907",
+    "random_se": "4.66740857294138572951964e-16",
+    "random_std": "1.47596418610909187214028e-14"
+  },
+  "meta": {
+    "run_env": {
+      "platform": "Windows-10-10.0.19045-SP0",
+      "python": "3.11.2"
+    },
+    "schema_version": "1.1",
+    "script": "cq.py"
+  },
+  "outputs": {
+    "C_Q": {
+      "decimal_24": "0.014102564102564102768711",
+      "rational": "11/780"
+    },
+    "C_Qhat": {
+      "decimal_24": "0.5",
+      "precision": {
+        "abs_err_bound": 2.937650123158164e-13,
+        "credible_sig_digits": 12,
+        "method": "digits from max(|r_i-mean|, sf\u00b7SE); rounding cosmetic only",
+        "rounded_from": "0.500000000000000333066907"
+      },
+      "raw_decimal_24": "0.500000000000000333066907"
+    },
+    "lambda_york": {
+      "decimal_24": "0.0282051282051281881901872"
+    }
+  },
+  "status": {
+    "all_passed": true,
+    "passed_axis": true,
+    "passed_random": true
+  }
+}

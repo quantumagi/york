@@ -1,0 +1,44 @@
+{
+  "inputs": {
+    "C_A1g": {
+      "decimal": "0.328125",
+      "rational": "21/64",
+      "raw": "21/64"
+    },
+    "J2": {
+      "decimal": "1.33333333333333333333333333333333333333333333333333333333333",
+      "rational": "4/3",
+      "raw": "4/3"
+    },
+    "z_dir": {
+      "decimal": "0.32",
+      "rational": "8/25",
+      "raw": "8/25"
+    },
+    "z_parity": {
+      "decimal": "0.0761904761904761904761904761904761904761904761904761904761905",
+      "rational": "8/105",
+      "raw": "8/105"
+    }
+  },
+  "meta": {
+    "description": "CLI-only multiplication of upstream scalars (mpf-only).",
+    "ethos": "ETHOS: CLI in \u2192 JSON out; no embedded constants; no Python floats/Decimal.",
+    "run_env": {
+      "platform": "Windows-10-10.0.19045-SP0",
+      "python": "3.11.2"
+    },
+    "schema_version": "1.0",
+    "script": "gamma.py"
+  },
+  "outputs": {
+    "Gamma": {
+      "decimal": "0.0106666666666666666666666666666666666666666666666666666666667",
+      "desc": "Mid-edge amplitude \u0393 = \u03b6_parity \u00b7 J2 \u00b7 \u03b6_dir \u00b7 C_A1g (mpf arithmetic).",
+      "rational": "4/375"
+    }
+  },
+  "status": {
+    "ok": true
+  }
+}

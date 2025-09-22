@@ -1,0 +1,41 @@
+{
+  "inputs": {
+    "Gamma": {
+      "float": "0.0106666666666666666666666666666666666666666666666666666666667",
+      "rational": "4/375",
+      "raw": "4/375"
+    },
+    "H4_sq": {
+      "float": "0.0304761904761904761904761904761904761904761904761904761904762",
+      "rational": "16/525",
+      "raw": "16/525"
+    },
+    "chi_tt": {
+      "float": "0.0423076923076923076923076923076923076923076923076923076923077",
+      "rational": "11/260",
+      "raw": "11/260"
+    },
+    "fpp": {
+      "float": "0.989758182370755211347513",
+      "raw": "0.989758182370755211347513"
+    }
+  },
+  "meta": {
+    "description": "Quadratic lock correction \u0394L^(2) = (1/2) f''(x_q) \u27e8H4^2\u27e9 (\u03c7_TT \u0393)^2",
+    "ethos": "Upstream-only inputs; mpmath arithmetic; no embedded constants; no rational guessing.",
+    "run_env": {
+      "platform": "Windows-10-10.0.19045-SP0",
+      "python": "3.11.2"
+    },
+    "schema_version": "1.0",
+    "script": "dL2.py"
+  },
+  "outputs": {
+    "deltaL2": {
+      "decimal_48": "0.00000000307153809407259769466960334997651920728843805767"
+    }
+  },
+  "status": {
+    "ok": true
+  }
+}

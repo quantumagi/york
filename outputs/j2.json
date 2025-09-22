@@ -1,0 +1,42 @@
+{
+  "inputs": {
+    "chart_v_edge": [
+      "1",
+      "-1",
+      "0"
+    ],
+    "chart_v_perp": [
+      "0",
+      "0",
+      "1"
+    ],
+    "edge_direction_u0": [
+      "0.707106781186547",
+      "0.707106781186547",
+      "0.0"
+    ]
+  },
+  "intermediates": {
+    "tangent_metric_g11": "1.0",
+    "tangent_metric_g12": "0.0",
+    "tangent_metric_g22": "0.5"
+  },
+  "meta": {
+    "description": "Quarter-hop Jacobian^2 at mid-edge direction u0=(1,1,0)/\u221a2",
+    "ethos": "CLI-only; derives metric from exact differential; no JSON reads.",
+    "run_env": {
+      "platform": "Windows-10-10.0.19045-SP0",
+      "python": "3.11.2"
+    },
+    "schema_version": "1.0",
+    "script": "j2.py"
+  },
+  "outputs": {
+    "J2": {
+      "rational": "4/3"
+    }
+  },
+  "status": {
+    "ok": true
+  }
+}

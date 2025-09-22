@@ -1,0 +1,28 @@
+{
+  "intermediates": {
+    "group_size": 16,
+    "note": "Sum over any nontrivial character is zero by orthogonality; removing that line leaves (|G|-1)/|G|.",
+    "sum_chi_odd": 0
+  },
+  "meta": {
+    "description": "Mid-edge parity/Jacobian \u03b3_edge via (Z\u2082)^4 character projection.",
+    "ethos": "No inputs; no hard-coded value; exact finite-group derivation.",
+    "run_env": {
+      "platform": "Windows-10-10.0.19045-SP0",
+      "python": "3.11.2"
+    },
+    "schema_version": "1.0",
+    "script": "edge_parity.py"
+  },
+  "outputs": {
+    "gamma_edge": {
+      "decimal": "0.9375",
+      "desc": "Parity/Jacobian factor from mid-edge quotient.",
+      "float": 0.9375,
+      "rational": "15/16"
+    }
+  },
+  "status": {
+    "ok": true
+  }
+}

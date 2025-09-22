@@ -1,0 +1,34 @@
+{
+  "intermediates": {
+    "moments": {
+      "E_u4": "1/5"
+    }
+  },
+  "meta": {
+    "description": "Exact Dirichlet-based moments for the cubic A1g quartic harmonic H4 on S^2.",
+    "ethos": "CLI-only; no JSON reads; values derived from mainstream identities.",
+    "run_env": {
+      "platform": "Windows-10-10.0.19045-SP0",
+      "python": "3.11.2"
+    },
+    "schema_version": "1.0",
+    "script": "h4.py"
+  },
+  "outputs": {
+    "H4_m3": {
+      "decimal_48": "0.00306893106893106893106893106893106893106893106893",
+      "rational": "384/125125"
+    },
+    "H4_m4": {
+      "decimal_48": "0.002142234236351883410706940118704824587177528354",
+      "rational": "22784/10635625"
+    },
+    "H4_sq": {
+      "decimal_48": "0.0304761904761904761904761904761904761904761904762",
+      "rational": "16/525"
+    }
+  },
+  "status": {
+    "ok": true
+  }
+}

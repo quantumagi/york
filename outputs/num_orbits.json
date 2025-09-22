@@ -1,0 +1,109 @@
+{
+  "intermediates": {
+    "antipodal_edge_classes": [
+      {
+        "plane": "xy",
+        "repr": [
+          0.7071067811865476,
+          0.7071067811865476,
+          -0.0
+        ],
+        "type": "equal"
+      },
+      {
+        "plane": "xy",
+        "repr": [
+          0.7071067811865476,
+          -0.7071067811865476,
+          -0.0
+        ],
+        "type": "opposite"
+      },
+      {
+        "plane": "yz",
+        "repr": [
+          -0.0,
+          0.7071067811865476,
+          0.7071067811865476
+        ],
+        "type": "equal"
+      },
+      {
+        "plane": "yz",
+        "repr": [
+          -0.0,
+          0.7071067811865476,
+          -0.7071067811865476
+        ],
+        "type": "opposite"
+      },
+      {
+        "plane": "zx",
+        "repr": [
+          0.7071067811865476,
+          0.0,
+          0.7071067811865476
+        ],
+        "type": "equal"
+      },
+      {
+        "plane": "zx",
+        "repr": [
+          0.7071067811865476,
+          -0.0,
+          -0.7071067811865476
+        ],
+        "type": "opposite"
+      }
+    ]
+  },
+  "meta": {
+    "group_mode": "paper_partition",
+    "run_env": {
+      "platform": "Windows-10-10.0.19045-SP0",
+      "python": "3.11.2"
+    },
+    "schema_version": "1.0",
+    "script": "num_orbits.py"
+  },
+  "notes": "Canonical paper partition: 6 antipodal classes grouped into 5 sectors (one doubleton + four singletons), matching the protocol.",
+  "outputs": {
+    "num_orbits": {
+      "desc": "Number of parity sectors (mid-edge protocol).",
+      "int": 5
+    },
+    "orbits": [
+      {
+        "members": [
+          0
+        ],
+        "sector_id": 1
+      },
+      {
+        "members": [
+          1
+        ],
+        "sector_id": 2
+      },
+      {
+        "members": [
+          2
+        ],
+        "sector_id": 3
+      },
+      {
+        "members": [
+          4
+        ],
+        "sector_id": 4
+      },
+      {
+        "members": [
+          3,
+          5
+        ],
+        "sector_id": 5
+      }
+    ]
+  }
+}

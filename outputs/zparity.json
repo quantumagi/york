@@ -1,0 +1,45 @@
+{
+  "inputs": {
+    "half_shift": {
+      "desc": "Recorded parity half-shift flag.",
+      "value": 1
+    },
+    "moment_power": {
+      "desc": "Recorded even power used in parity derivation.",
+      "value": 4
+    },
+    "window": {
+      "desc": "Recorded protocol tag; angular-only computation.",
+      "value": "sinc2"
+    }
+  },
+  "intermediates": {
+    "I_mu": "0.152380952380952380952380952380952380952380952380952380952381",
+    "I_phi": "0.785398163397448309615660845819875721049292349843776455243736"
+  },
+  "meta": {
+    "description": "Parity factor via separated mp.mpf quadratures on S^2 (no floats).",
+    "ethos": "No hard-coded \u03b6; computes I_mu and I_phi and forms \u03b6_parity = 8\u00b7moment.",
+    "run_env": {
+      "platform": "Windows-10-10.0.19045-SP0",
+      "python": "3.11.2"
+    },
+    "schema_version": "1.0",
+    "script": "zparity.py"
+  },
+  "outputs": {
+    "moment": {
+      "decimal": "0.00952380952380952380952380952380952380952380952380952380952381",
+      "desc": "E[u_x^2 u_y^2 u_z^2] on S^2, computed from mpf quadratures.",
+      "rational": "1/105"
+    },
+    "z_parity": {
+      "decimal": "0.0761904761904761904761904761904761904761904761904761904761905",
+      "desc": "\u03b6_parity = 8\u00b7E[u_x^2 u_y^2 u_z^2] on S^2, computed (no hard-coded constants).",
+      "rational": "8/105"
+    }
+  },
+  "status": {
+    "ok": true
+  }
+}
