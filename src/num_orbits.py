@@ -4,7 +4,7 @@
 num_orbits.py
 
 PURPOSE
-    Certify the "five equal mid-edge sectors" statement used by the protocol.
+    Certify the "five mid-edge sectors" statement used by the protocol.
     We enumerate the 12 cube-edge directions, collapse to 6 antipodal classes,
     and partition those 6 classes into 5 parity sectors (one sector holds two
     classes; the other four are singletons). The emitted JSON conforms to the
@@ -44,22 +44,20 @@ from pathlib import Path
 from typing import List, Tuple, Dict
 
 # --------------------------
-# Utility: normalized tuples
+# Integer-safe canonicalization
 # --------------------------
-def _norm(v: Tuple[int, int, int]) -> Tuple[float, float, float]:
-    n = math.sqrt(sum(x * x for x in v))
-    return tuple(x / n for x in v)
+def _canon_antipodal_int(v: Tuple[int, int, int]) -> Tuple[int, int, int]:
+    """Canonical representative for antipodal classes of (±1, ±1, 0) edge vectors:
+    flip sign so the first nonzero entry is positive."""
+    a, b, c = v
+    for x in (a, b, c):
+        if x != 0:
+            return v if x > 0 else (-a, -b, -c)
+    return v  # should not occur for edge vectors
 
-def _antipodal_rep(v: Tuple[float, float, float]) -> Tuple[float, float, float]:
-    """Canonical representative for an antipodal class: flip sign so first nonzero ≥ 0."""
-    vv = list(v)
-    for x in vv:
-        if abs(x) > 1e-12:
-            if x < 0:
-                vv = [-xi for xi in vv]
-            break
-    n = math.sqrt(sum(x * x for x in vv))
-    return tuple(x / n for x in vv)
+def _normalize_int(v: Tuple[int, int, int]) -> Tuple[float, float, float]:
+    n = math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
+    return (v[0]/n, v[1]/n, v[2]/n)
 
 # -------------------------------------
 # Step 1: enumerate E12 and antipodals
@@ -70,49 +68,47 @@ def enumerate_edge_classes() -> Tuple[List[Tuple[float, float, float]], List[Dic
       reps: list of 6 canonical unit vectors (antipodal classes of edge directions)
       meta: list of dicts with plane/type for each rep (same order as reps)
     """
-    # Build the 12 edge directions: permutations of (±1, ±1, 0)
-    edges = set()
+    # Build the 12 edge directions as integer triples: permutations of (±1, ±1, 0)
+    edges_int = set()
     base = (1, 1, 0)
     for perm in set(itertools.permutations(base, 3)):
-        zeros = [i for i, x in enumerate(perm) if x == 0]
-        assert len(zeros) == 1
-        nz_idx = [i for i, x in enumerate(perm) if x != 0]
-        for s1, s2 in itertools.product([-1, 1], repeat=2):
+        nz = [i for i, x in enumerate(perm) if x != 0]  # indices of nonzeros (two of them)
+        for s1, s2 in itertools.product((-1, 1), repeat=2):
             v = [0, 0, 0]
-            v[nz_idx[0]] = s1
-            v[nz_idx[1]] = s2
-            edges.add(_norm(tuple(v)))
-            edges.add(_norm(tuple(-x for x in v)))  # explicitly include antipodal (redundant but harmless)
+            v[nz[0]] = s1
+            v[nz[1]] = s2
+            edges_int.add(tuple(v))  # 12 signed directions
 
-    # Collapse antipodal pairs to 6 reps
-    reps = []
-    rep_set = set()
-    for v in edges:
-        r = _antipodal_rep(v)
-        if r not in rep_set:
-            rep_set.add(r)
-            reps.append(r)
+    # Collapse antipodal pairs to 6 reps using exact integer canonicalization
+    reps_int = []
+    seen = set()
+    for v in edges_int:
+        r = _canon_antipodal_int(v)
+        if r not in seen:
+            seen.add(r)
+            reps_int.append(r)
 
-    # Meta-tagging: plane & equal/opposite sign in that plane
-    def classify(rep: Tuple[float, float, float]) -> Dict:
-        x, y, z = rep
-        if abs(z) < 1e-12:
+    assert len(reps_int) == 6, f"Expected 6 antipodal edge classes, got {len(reps_int)}"
+
+    # Classify by plane and parity (exact integer tests)
+    meta = []
+    for r in reps_int:
+        x, y, z = r
+        if z == 0:
             plane = "xy"
-            t = "equal" if x * y > 0 else "opposite"
-        elif abs(x) < 1e-12:
+            typ = "equal" if x*y > 0 else "opposite"
+        elif x == 0:
             plane = "yz"
-            t = "equal" if y * z > 0 else "opposite"
+            typ = "equal" if y*z > 0 else "opposite"
         else:
             plane = "zx"
-            t = "equal" if z * x > 0 else "opposite"
-        return {"repr": [rep[0], rep[1], rep[2]], "plane": plane, "type": t}
-
-    meta = [classify(rep) for rep in reps]
+            typ = "equal" if z*x > 0 else "opposite"
+        meta.append({"repr": list(_normalize_int(r)), "plane": plane, "type": typ})
 
     # Stable sort by plane then type for reproducibility
     order = {"xy": 0, "yz": 1, "zx": 2}
     torder = {"equal": 0, "opposite": 1}
-    reps_meta = list(zip(reps, meta))
+    reps_meta = list(zip([_normalize_int(r) for r in reps_int], meta))
     reps_meta.sort(key=lambda rm: (order[rm[1]["plane"]], torder[rm[1]["type"]]))
     reps_sorted, meta_sorted = zip(*reps_meta)
     return list(reps_sorted), list(meta_sorted)
@@ -190,13 +186,11 @@ def derive_orbits_from_group(meta: List[Dict]) -> List[List[int]]:
 
     # Orbits under G with antipodal identification
     def canon(v):
-        vv = list(v)
-        for x in vv:
+        a, b, c = v
+        for x in (a, b, c):
             if x != 0:
-                if x < 0:
-                    vv = [-t for t in vv]
-                break
-        return tuple(vv)
+                return (a, b, c) if x > 0 else (-a, -b, -c)
+        return v
 
     labels = [None] * len(rep_vecs)
     orbits = []
@@ -242,6 +236,8 @@ def main() -> None:
         mode_used = "paper_partition"
         notes = ("Canonical paper partition: 6 antipodal classes grouped into 5 sectors "
                  "(one doubleton + four singletons), matching the protocol.")
+        # Guardrail: paper mode must yield 5
+        assert len(orbits) == 5, "Paper partition must produce 5 sectors"
 
     num = len(orbits)
 
@@ -277,6 +273,8 @@ def main() -> None:
     print("=== num_orbits ===")
     print(f"mode         : {mode_used}")
     print(f"num_orbits   : {num}")
+    if mode_used == "paper_partition" and num != 5:
+        print("[WARN] expected 5 sectors in paper partition mode")
     for s in result["outputs"]["orbits"]:
         print(f"  sector {s['sector_id']}: members {s['members']}")
     print(f"Wrote {out_path}")

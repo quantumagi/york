@@ -25,7 +25,7 @@ INPUTS
   --dkappa      : absolute κ_∞ uncertainty (from upstream; no file reads)
   --x-q         : x_q from xq.py
   --L0          : (audit-only) optional L0; NEVER overrides L0(x_q)
-  --chi-tt | --tt-drift : one is required (χ_TT or its per-m drift tt=χ_TT/6)
+  --chi-tt      : χ_TT from chitt.py
   --deltaL2     : ΔL^(2) from dL2.py
   --Gamma       : Γ from gamma.py
   --f3, --f4    : f'''(x_q), f''''(x_q) from xq.py
@@ -35,7 +35,7 @@ INPUTS
 
 DERIVATION (no (a,b))
   1) L0 comes from x_q only: L0 = −log(sinc^2 x_q).
-  2) TT drift: tt := χ_TT/6 if χ_TT given; else tt provided directly.
+  2) TT drift: tt := χ_TT/6.
   3) Fejér tails:
        S_odd = Σ_{k≥3} 1/(2k+1)!    (with remainder bound),
        S_even(s) = Σ_{n≥4} [2 B_{2n}/(n(2n)!)] s^{2n}  (with remainder bound),
@@ -161,7 +161,6 @@ def assemble_and_observe(
     xq_s: str,
     L0_s_opt: Optional[str],
     chi_tt_s: Optional[str],
-    tt_drift_s: Optional[str],
     deltaL2_s: str,
     Gamma_s: str,
     f3_s: str,
@@ -207,14 +206,9 @@ def assemble_and_observe(
 
     # χ_TT / tt_drift reconciliation
     chi_tt = parse_number(chi_tt_s).float if chi_tt_s is not None else None
-    tt_in  = parse_number(tt_drift_s).float if tt_drift_s is not None else None
-    if chi_tt is None and tt_in is None:
-        raise SystemExit("[alpha] Need one of --chi-tt or --tt-drift.")
     if chi_tt is None:
-        chi_tt = 6 * tt_in
+        raise SystemExit("[alpha] Must supply --chi-tt.")
     tt = chi_tt / 6
-    if tt_in is not None and mp.fabs(tt - tt_in) > mp.mpf('1e-18'):
-        print(f"[alpha] WARNING: tt_drift differs from χ_TT/6 (audit-only).")
 
     # Fejér tails with remainder bounds
     Sodd,  Sodd_err  = S_odd_tail(tol)
@@ -373,8 +367,7 @@ def main() -> None:
     ap.add_argument("--dkappa",  type=str, required=True, help="absolute κ_∞ uncertainty (from upstream)")
     ap.add_argument("--x-q",     type=str, required=True, help="x_q from xq.py")
     ap.add_argument("--L0",      type=str, required=False, help="optional L0 audit (never overrides L0(x_q))")
-    ap.add_argument("--chi-tt",  type=str, required=False, help="χ_TT from chitt.py (or provide tt-drift)")
-    ap.add_argument("--tt-drift",type=str, required=False, help="tt drift directly (or provide chi-tt)")
+    ap.add_argument("--chi-tt",  type=str, required=True, help="χ_TT from chitt.py")
     ap.add_argument("--deltaL2", type=str, required=True, help="ΔL^(2) from dL2.py")
     ap.add_argument("--Gamma",   type=str, required=True, help="Γ from gamma.py")
     ap.add_argument("--f3",      type=str, required=True, help="f'''(x_q) from xq.py")
@@ -398,7 +391,6 @@ def main() -> None:
         xq_s=args.x_q,
         L0_s_opt=args.L0,
         chi_tt_s=args.chi_tt,
-        tt_drift_s=args.tt_drift,
         deltaL2_s=args.deltaL2,
         Gamma_s=args.Gamma,
         f3_s=args.f3,
@@ -418,7 +410,6 @@ def main() -> None:
             "x_q":      {"decimal": args.x_q},
             "L0":       ({"decimal": args.L0} if args.L0 is not None else {"decimal": None}),
             "chi_tt":   ({"decimal": args.chi_tt} if args.chi_tt is not None else {"decimal": None}),
-            "tt_drift": ({"decimal": args.tt_drift} if args.tt_drift is not None else {"decimal": None}),
             "deltaL2":  {"decimal": args.deltaL2},
             "Gamma":    {"decimal": args.Gamma},
             "f3":       {"decimal": args.f3},

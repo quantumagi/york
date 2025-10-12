@@ -10,9 +10,9 @@ ETHOS
     theory, substantiated, and contextually appropriate at the point of usage.
 
 WHAT THIS CERTIFIES
-  Computes the transverse–traceless linear-response scale χ_TT and the TT drift
-  (tt_drift) from an upstream York constant C_Q, with exact-fraction propagation
-  whenever the upstream provides an exact Fraction via utils.parse_number.
+  Computes the transverse–traceless linear-response scale χ_TT from an upstream 
+  York constant C_Q, with exact-fraction propagation whenever the upstream provides 
+  an exact Fraction via utils.parse_number.
 
 INPUTS
   1) --C-Q <scalar or exact fraction>   (required; produced by cq.py)
@@ -22,8 +22,6 @@ DERIVATION (no (a,b))
   • Cubic symmetry (O_h) ⇒ χ_TT = 3 · C_Q (sum over xy, yz, zx planes).
     (Dresselhaus–Dresselhaus–Jorio, *Group Theory*, Springer 2008;
      York, *J. Math. Phys.* 14, 456–464 (1973))
-  • York TT normalization in 3D ⇒ tt_drift = (1/6) · χ_TT.
-    (York 1973; Misner–Thorne–Wheeler, *Gravitation* §35.12)
 
 OUTPUT (JSON → outputs/chitt.json)
   {
@@ -31,8 +29,7 @@ OUTPUT (JSON → outputs/chitt.json)
     "inputs": {...},
     "intermediates": {...},
     "outputs": {
-      "chi_tt":   { "decimal_24": "...", "rational": "p/q" },
-      "tt_drift": { "decimal_24": "...", "rational": "p/q" }
+      "chi_tt":   { "decimal_24": "...", "rational": "p/q" }
     },
     "status": {"ok": true}
   }
@@ -63,17 +60,13 @@ def nstr_plain(x: mp.mpf, sig: int = DEC_SIG) -> str:
 # Refs near use: Dresselhaus–Dresselhaus–Jorio (2008); York (1973).
 YORK_ORIENTATION_MULT = mp.mpf('3')
 
-# tt_drift = (1/6)·χ_TT under the York TT normalization in 3D.
-# Refs near use: York (1973); Misner–Thorne–Wheeler (1973) §35.12.
-TT_DRIFT_COEFF        = mp.mpf('1')/mp.mpf('6')
-
 def comb2(d: int) -> int:
     return d * (d - 1) // 2
 
 # ---------------------------------- main ----------------------------------
 def main() -> None:
     ap = argparse.ArgumentParser(
-        description="Derive chi_tt and tt_drift from York C_Q (exact-fraction aware; no rational guessing)."
+        description="Derive chi_tt from York C_Q (exact-fraction aware; no rational guessing)."
     )
     ap.add_argument("--C-Q", dest="C_Q", type=str, required=True,
                     help="C_Q value (float or exact fraction). Upstream: cq.py")
@@ -94,7 +87,6 @@ def main() -> None:
 
     # Results
     chi_tt   = YORK_ORIENTATION_MULT * C_Q
-    tt_drift = TT_DRIFT_COEFF * chi_tt
 
     # Exact propagation if C_Q was rational
     chi_frac: Optional[Fraction] = None
@@ -109,9 +101,6 @@ def main() -> None:
     print(f"χ_TT = 3·C_Q             : {nstr_plain(chi_tt)}")
     if chi_frac is not None:
         print(f"  (exact)                : {chi_frac.numerator}/{chi_frac.denominator}")
-    print(f"tt_drift = (1/6)·χ_TT    : {nstr_plain(tt_drift)}")
-    if tt_frac is not None:
-        print(f"  (exact)                : {tt_frac.numerator}/{tt_frac.denominator}")
     print()
 
     # JSON — data only; references live in comments near the constants above.
@@ -131,7 +120,6 @@ def main() -> None:
         "intermediates": {
             "constants": {
                 "YORK_ORIENTATION_MULT": {"expr": "3", "decimal_24": nstr_plain(YORK_ORIENTATION_MULT)},
-                "TT_DRIFT_COEFF": {"expr": "1/6", "decimal_24": nstr_plain(TT_DRIFT_COEFF)},
                 "n_planes_theory": {"int": comb2(3)}  # C(3,2)=3
             }
         },
@@ -139,10 +127,6 @@ def main() -> None:
             "chi_tt": {
                 "decimal_24": nstr_plain(chi_tt),
                 **({"rational": f"{chi_frac.numerator}/{chi_frac.denominator}"} if chi_frac else {})
-            },
-            "tt_drift": {
-                "decimal_24": nstr_plain(tt_drift),
-                **({"rational": f"{tt_frac.numerator}/{tt_frac.denominator}"} if tt_frac else {})
             }
         },
         "status": {"ok": True}

@@ -1,0 +1,51 @@
+{
+  "intermediates": {
+    "FunkHecke": {
+      "IP_den": "4/35",
+      "IP_num": "16/315",
+      "ratio_inner": "4/9"
+    },
+    "gains": {
+      "gamma_TT": "7/20",
+      "xi_TT": "63/80"
+    },
+    "legendre": {
+      "P2sq_P4": "18/35",
+      "a4_FTT": "4/35",
+      "ratio_axis_vs_P2sq": "2/9"
+    },
+    "tt_eigen": {
+      "gamma_TT": "7/20"
+    }
+  },
+  "meta": {
+    "description": "Merged derivation of \u03b3_TT, \u03be_TT, and C_A1g via exact projector algebra and Funk\u2013Hecke (no literals).",
+    "ethos": "No downstream reads; symbolic identities; no hard-coded targets.",
+    "run_env": {
+      "platform": "Windows-10-10.0.19045-SP0",
+      "python": "3.11.2"
+    },
+    "schema_version": "1.0",
+    "script": "a1g_xi_tt.py"
+  },
+  "outputs": {
+    "C_A1g": {
+      "decimal_48": "0.328125",
+      "float": 0.328125,
+      "rational": "21/64"
+    },
+    "gamma_TT": {
+      "decimal_48": "0.35",
+      "float": 0.35,
+      "rational": "7/20"
+    },
+    "xi_TT": {
+      "decimal_48": "0.7875",
+      "float": 0.7875,
+      "rational": "63/80"
+    }
+  },
+  "status": {
+    "ok": true
+  }
+}

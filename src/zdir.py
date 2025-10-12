@@ -15,11 +15,15 @@ PURPOSE
 
       ζ_dir = (3/5) · R
 
-  and with N parity sectors the per-sector share is
+  and with N parity sectors, an **equal-split** per-sector share would be
 
       ζ_wedge = ζ_dir / N.
 
-  For R = 8/15 and N = 5 this yields ζ_dir = 8/25 and ζ_wedge = 8/125.
+  In the protocol’s canonical partition (one doubleton + four singletons; see num_orbits.py),
+  report per-sector shares accordingly:
+      ζ_single = ζ_dir / N,     ζ_double = 2·ζ_dir / N.
+
+  For R = 8/15 and N = 5 this yields ζ_dir = 8/25; hence ζ_single = 8/125 and ζ_double = 16/125.
 
 CITATION SKETCH
   • Fejér (power) window & FWHM practice: Harris (Proc. IEEE, 1978); Oppenheim & Schafer.

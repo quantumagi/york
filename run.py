@@ -28,8 +28,7 @@ CONFIG = {
     # ---- Protocol flags (window) ----
     "hypothesis.py": {
       "outputs": {
-          "window": "outputs.window",
-          "lock_ratio": "outputs.lock_ratio"
+          "window": "outputs.window"
       },
       "inputs": []
     },
@@ -38,31 +37,18 @@ CONFIG = {
     "m.py": {
       "outputs": {"m_first": "outputs.m_first"},
       "inputs": [
-        {"flag": "--xq", "var": "x_q"}          
+        {"flag": "--xq", "var": "x_q"}          # x_q produced by xq.py (see mapping below)
       ]
     },
 
-    # ---- Fejér quarter-FWHM & curvature ----
     "xq.py": {
       "outputs": {
         "x_q": "outputs.x_q", "L0": "outputs.L0",
         "fpp": "outputs.fpp", "f3": "outputs.f3", "f4": "outputs.f4"
       },
       "inputs": [
-        {"flag": "--lock-ratio", "var": "lock_ratio"}
+        {"flag": "--lock-ratio", "var": "lock_ratio"}   # pure χ from chitt.py
       ]
-    },
-    
-    "fejer_lock.py": {
-        "outputs": {"K_x_q": "outputs.K_x_q"},
-        "inputs": [         
-            {"flag": "--chi-tt",   "var": "chi_tt"},
-            {"flag": "--j2",       "var": "J2"},
-            {"flag": "--z-parity", "var": "z_parity"},
-            {"flag": "--z-dir",    "var": "z_dir"},
-            {"flag": "--c-a1g",    "var": "C_A1g"},
-            {"flag": "--scale",    "literal": "1"}  # or a producer if you have one
-        ]
     },
 
     # ---- Spherical moments ----
@@ -112,10 +98,12 @@ CONFIG = {
       "outputs": {"C_Qhat": "outputs.C_Qhat", "C_Q": "outputs.C_Q"},
       "inputs": []
     },
+
+    # chitt now CONSUMES xi_TT (for visibility), gamma_TT, gamma_edge, C_A1g, C_Q
     "chitt.py": {
-      "outputs": {"chi_tt": "outputs.chi_tt", "tt_drift": "outputs.tt_drift"},
+      "outputs": {"chi_tt": "outputs.chi_tt"},
       "inputs": [
-        {"flag": "--C-Q", "var": "C_Q"}  # supports "n/d" (preferred) or decimal string
+        {"flag": "--C-Q",   "var": "C_Q.rational"}
       ]
     },
 
@@ -125,22 +113,21 @@ CONFIG = {
       "inputs": []
     },
     
-    "xi_tt.py": {
-      "outputs": {"xi_TT": "outputs.xi_TT"},
-      "inputs": []
-    },
-
     # ---- Mid-edge parity quotient (derived, producer) ----
     "edge_parity.py": {
-      "outputs": {"gamma_edge": "outputs.gamma_edge"},
+      "outputs": {"gamma_edge": "outputs.gamma_edge", "lock_ratio": "outputs.lock_condition.k_xq.rational"},
       "inputs": []
     },
     
-    "a1g.py": {
-      "outputs": {"C_A1g": "outputs.C_A1g"},
+    "a1g_xi_tt.py": {
+      "outputs": {
+        "C_A1g":      "outputs.C_A1g",
+        "xi_TT":      "outputs.xi_TT",
+        "gamma_TT":   "intermediates.gains.gamma_TT",
+        "ratio_inner":"intermediates.legendre.ratio_axis_vs_P2sq"
+      },
       "inputs": [
-        {"flag": "--xi-tt",      "var": "xi_TT.rational"},
-        {"flag": "--gamma-edge", "var": "gamma_edge.rational"}
+        {"flag": "--gamma-edge", "var": "gamma_edge.rational"}  # from edge_parity.py
       ]
     },
 
@@ -184,7 +171,6 @@ CONFIG = {
         {"flag": "--x-q",      "var": "x_q.float:48"},
         {"flag": "--L0",       "var": "L0", "optional": True},
         {"flag": "--chi-tt",   "var": "chi_tt"},
-        {"flag": "--tt-drift", "var": "tt_drift"},
         {"flag": "--deltaL2",  "var": "deltaL2"},
         {"flag": "--Gamma",    "var": "Gamma"},
         {"flag": "--f3",       "var": "f3.float:48"},
@@ -193,17 +179,7 @@ CONFIG = {
         {"flag": "--H4-m4",    "var": "H4_m4.float:48"},
         {"flag": "--J2",       "var": "J2"}
       ]
-    },
-
-    # ---- Optional sensitivity ----
-    "alpha_sens.py": {
-      "outputs": {"sens_summary": "outputs.summary"},
-      "inputs": [
-        {"flag": "--m",      "var": "m_first"},
-        {"flag": "--kappa",  "var": "kappa_infty"},
-        {"flag": "--alpha",  "var": "alpha_inv", "optional": True}
-      ]
-    },
+    }
   }
 }
 

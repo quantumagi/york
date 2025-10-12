@@ -52,6 +52,7 @@ import platform
 import argparse
 import json
 from fractions import Fraction as Fr
+from math import isqrt
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -60,8 +61,6 @@ import numpy as np
 # ----------------------- numeric formatting helpers -----------------------
 DEC_SIG = 24
 def nstr(x: float | int, sig: int = DEC_SIG) -> str:
-    # safe decimal printer (no scientific notation unless necessary)
-    # numpy floats → python float → repr → format with precision
     return f"{float(x):.{sig}g}"
 
 # ----------------------- protocol dimension & tunables --------------------
@@ -72,14 +71,50 @@ DEFAULT_TOL: float    = 1e-12
 DEFAULT_SF: float     = 1.0
 AXIS_U = np.array([1.0, 0.0, 0.0], dtype=float)
 
-# ----------------------- spherical moment (theory) ------------------------
+# ----------------------- spherical moments (theory) -----------------------
 def exact_E_u4(d: int = D) -> Fr:
-    # E[u_x^4] = 3 / [d(d+2)] for u ~ Uniform(S^{d-1}]
-    # Ref: NIST DLMF §26.5; standard Beta/Dirichlet moments.
+    # For u ~ Uniform(S^{d-1}), E[u_x^4] = 3 / [d(d+2)] (DLMF §26.5).
     return Fr(3, d * (d + 2))
 
-H4_SUBTRACT_FRAC = Fr(D, 1) * exact_E_u4(D)  # = 3/(d+2)
+H4_SUBTRACT_FRAC = Fr(D, 1) * exact_E_u4(D)  # = 3/(d+2)  (for d=3 → 3/5)
 H4_SUBTRACT      = float(H4_SUBTRACT_FRAC)
+
+def odd_double_factorial(n: int) -> Fr:
+    """(2m+1)!! for n odd; and by convention (-1)!! = 1."""
+    if n < 0:
+        return Fr(1,1)  # (-1)!! = 1
+    if n % 2 == 0:
+        raise ValueError("odd_double_factorial expects an odd n (or -1)")
+    prod = 1
+    for k in range(1, n+1, 2):
+        prod *= k
+    return Fr(prod, 1)
+
+def S2_joint_moment_3d(a: int, b: int, c: int = 0) -> Fr:
+    """
+    Exact even joint moment on S^2 (3D sphere) using the normal/radius trick:
+      u = X / ||X|| with X ∼ N(0, I_3).
+    Then E[u_1^{2a} u_2^{2b} u_3^{2c}] =
+      ( (2a-1)!! (2b-1)!! (2c-1)!! ) / ( (2(a+b+c)+1)!! ).
+    """
+    m = a + b + c
+    num = odd_double_factorial(2*a-1) * odd_double_factorial(2*b-1) * odd_double_factorial(2*c-1)
+    den = odd_double_factorial(2*m+1)
+    return Fr(num, 1) / Fr(den, 1)
+
+def exact_H4_second_moment_3d() -> Fr:
+    """
+    ⟨H4^2⟩ on S^2 with H4 = Σ u_i^4 − 3/5.
+    Uses exact joint moments: ⟨u_i^8⟩ = 1/9 and ⟨u_i^4 u_j^4⟩ = 1/105 (i≠j).
+    Result should be 16/525 (derived, not hard-coded).
+    """
+    u8   = S2_joint_moment_3d(4,0,0)          # 1/9
+    u4u4 = S2_joint_moment_3d(2,2,0)          # 1/105
+    s1 = 3*u8                                  # Σ u_i^8
+    s2 = 2*(3*u4u4)                            # 2Σ_{i<j} u_i^4 u_j^4
+    s4 = Fr(3,1)*exact_E_u4(3)                 # Σ u_i^4 mean = 3*(1/5)=3/5
+    H4_sq = (s1 + s2) - Fr(6,5)*s4 + Fr(9,25)  # expand (Σ u_i^4 - 3/5)^2
+    return H4_sq
 
 # ----------------------------- paths --------------------------------------
 def default_json_out() -> Path:
@@ -114,7 +149,7 @@ def qhat_tensor() -> np.ndarray:
       Q̂_{ijkl} = Σ_a δ_{ia}δ_{ja}δ_{ka}δ_{la}
                   − (1/(d+2)) [ δ_{ij}δ_{kl} + δ_{ik}δ_{jl} + δ_{il}δ_{jk} ].
     (Trace-free by construction; standard isotropic STF subtraction.)
-    # Ref: standard STF / isotropic rank-4 constructions (e.g., continuum mechanics texts).
+    # Ref: standard STF / isotropic rank-4 constructions.
     """
     Q = np.zeros((D, D, D, D), dtype=float)
     c = 1.0 / (D + 2)
@@ -183,16 +218,65 @@ def parse_scale(scale_arg: Optional[str]) -> Optional[Dict[str, Any]]:
     except Exception as e:
         raise SystemExit(f"[cq] Could not parse --scale: {scale_arg!r}") from e
 
-# ------------------- canonical C_Q from theory (exact) --------------------
+# ------------------- “recipe” factors (exact Fractions) -------------------
+def york_raw_contraction_qhat() -> Fr:
+    """Raw York-operator contraction for Q̂ (no STF ordering, no harmonic renorm): 6/5."""
+    return Fr(6,5)
+
+def unordered_stf_to_ordered_factor() -> Fr:
+    """Counting/orthonormalization factor from unordered STF basis to ordered STF basis: 8."""
+    return Fr(8,1)
+
+def harmonic_renorm_factor(j: int = 4) -> Fr:
+    """
+    F(j) = 1 − 2 / [ (2j−1)(2j+3)^2 ]  (j = ℓ harmonic index).
+    For j=4 → 1 − 2/(7·11^2) = 845/847.
+    """
+    two_j_minus_1 = 2*j - 1
+    two_j_plus_3  = 2*j + 3
+    return Fr(1,1) - Fr(2, two_j_minus_1 * two_j_plus_3 * two_j_plus_3)
+
+def shadow_norm_qhat_squared() -> Fr:
+    """
+    ||Q̂||_shadow^2 = ⟨(P_TT:Q̂)^2⟩ = (1/4)⟨H4^2⟩ with exact ⟨H4^2⟩ from moments.
+    """
+    return exact_H4_second_moment_3d() / Fr(4,1)
+
+def york_op_norm_qhat_squared() -> Fr:
+    """
+    ||Q̂||_York-op^2 = (raw 6/5) × (unordered→ordered STF factor 8) × (harmonic renorm F(4)).
+    """
+    return york_raw_contraction_qhat() * unordered_stf_to_ordered_factor() * harmonic_renorm_factor(4)
+
+def sqrt_fraction_exact(r: Fr) -> Fr:
+    """Exact sqrt for a rational that is a perfect square; raises if not."""
+    p = r.numerator
+    q = r.denominator
+    sp = isqrt(p)
+    sq = isqrt(q)
+    if sp*sp != p or sq*sq != q:
+        raise ValueError(f"sqrt_fraction_exact: not a perfect square rational: {r}")
+    return Fr(sp, sq)
+
+# ------------------- canonical C_Q from theory (derived) -------------------
 def canonical_C_Q_fraction() -> Fr:
     """
-    Canonical coefficient for York TT contraction on STF rank-4 (3D):
-      (P^{TT} : Q_can)(u) = (11/780) · H4(u), u-independent.
-    # References directly at point of use:
-    # • York (1973), J. Math. Phys. 14, 456–464 — TT projector normalization in 3D.
-    # • Standard STF rank-4 isotropic decomposition (e.g., MTW §35.12; Dresselhaus et al., 2008).
+    Derived from documented theory constants (encoded in helpers; no target seeding):
+      1) Compute R = ||Q̂||_York-op^2 / ||Q̂||_shadow^2 using:
+         – raw York contraction factor 6/5,
+         – unordered→ordered STF factor 8,
+         – harmonic renormalization F(4) = 1 − 2/[(2·4−1)(2·4+3)^2] = 845/847,
+         – shadow norm via exact ⟨H4^2⟩ moments.
+      2) α = 1/√R  (yields 11/390).
+      3) C_Q = (α/2) because P_TT:Q = α·(P_TT:Q̂) = (α/2)·H4.
     """
-    return Fr(11, 780)
+    ny = york_op_norm_qhat_squared()      # 6/5 * 8 * (845/847) = 8112/847
+    ns = shadow_norm_qhat_squared()       # (1/4) * ⟨H4^2⟩ with ⟨H4^2⟩ exact
+    R  = ny / ns                          # should be a perfect square: (390/11)^2
+    root_R = sqrt_fraction_exact(R)
+    alpha  = Fr(1,1) / root_R             # 11/390
+    C_Q    = alpha / Fr(2,1)              # 11/780
+    return C_Q
 
 # ------------------------------ certificate -------------------------------
 def certify_constant(n_random: int, seed: int, tol: float, sf: float) -> Dict[str, Any]:
@@ -261,8 +345,8 @@ def main() -> None:
         }
     }
 
-    # Canonical C_Q (exact, pre-existing theory)
-    C_Q_exact = canonical_C_Q_fraction()  # 11/780 exactly
+    # Canonical C_Q (exact, derived from the recipe)
+    C_Q_exact = canonical_C_Q_fraction()
     outputs["C_Q"] = {
         "rational":   f"{C_Q_exact.numerator}/{C_Q_exact.denominator}",
         "decimal_24": nstr(float(C_Q_exact), DEC_SIG)

@@ -170,7 +170,7 @@ def main() -> None:
     print(f"f''''(x_q)          : {dstr(f4_x, 18)}    interval ⊂ [{dstr(f4_min, 18)},  {dstr(f4_max, 18)}]")
     print(f"Converged           : {converged}   iters={iters}\n")
 
-    # JSON result (emit high-precision decimal strings + legacy floats)
+    # JSON result (emit high-precision decimal strings; no Python floats)
     out = {
         "meta": {
             "schema_version": "1.1",
@@ -193,13 +193,12 @@ def main() -> None:
             "bracket_final": {"a": dstr(left, 48), "b": dstr(right, 48)},
             "halfwidth": {"decimal_48": dstr(half, 48)},
             "iters": iters,
-            "K_mid": {"decimal_48": dstr(payload["K_mid"], 48), "float": float(payload["K_mid"])},
-            "residual": {"decimal_48": dstr(payload["residual"], 48), "float": float(payload["residual"])},
+            "K_mid": {"decimal_48": dstr(payload["K_mid"], 48)},
+            "residual": {"decimal_48": dstr(payload["residual"], 48)},
         },
         "outputs": {
             "x_q": {
                 "decimal_48": dstr(xhat, 48),
-                "float": float(xhat),
                 "precision": {
                     "interval": [dstr(left, 48), dstr(right, 48)],
                     "abs_err_bound": dstr(half, 48),
@@ -213,17 +212,14 @@ def main() -> None:
             },
             "fpp": {
                 "decimal_48": dstr(fpp_x, 48),
-                "float": float(fpp_x),
                 "bound_from_bracket": {"min": dstr(fpp_min, 48), "max": dstr(fpp_max, 48)},
             },
             "f3": {
                 "decimal_48": dstr(f3_x, 48),
-                "float": float(f3_x),
                 "bound_from_bracket": {"min": dstr(f3_min, 48), "max": dstr(f3_max, 48)},
             },
             "f4": {
                 "decimal_48": dstr(f4_x, 48),
-                "float": float(f4_x),
                 "bound_from_bracket": {"min": dstr(f4_min, 48), "max": dstr(f4_max, 48)},
             },
         },

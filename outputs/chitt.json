@@ -8,10 +8,6 @@
   },
   "intermediates": {
     "constants": {
-      "TT_DRIFT_COEFF": {
-        "decimal_24": "0.166666666666666657414808",
-        "expr": "1/6"
-      },
       "YORK_ORIENTATION_MULT": {
         "decimal_24": "3.0",
         "expr": "3"
@@ -33,10 +29,6 @@
     "chi_tt": {
       "decimal_24": "0.0423076923076923076923077",
       "rational": "11/260"
-    },
-    "tt_drift": {
-      "decimal_24": "0.0070512820512820508906265",
-      "rational": "11/1560"
     }
   },
   "status": {

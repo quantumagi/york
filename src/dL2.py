@@ -8,8 +8,6 @@ ETHOS
     circularity, and not hard-coded in this script.
   • Explicit constants, ratios and formulas are documented from pre-existing
     theory, substantiated, and contextually appropriate at the point of usage.
-  • No rational guessing: fractions are preserved if passed as "p/q"; otherwise
-    decimals are used as provided.
 
 WHAT THIS CERTIFIES
   Computes the quadratic anisotropy correction to the Fejér–York lock width,
@@ -39,6 +37,7 @@ OUTPUT (JSON → outputs/dL2.json)
 from __future__ import annotations
 import argparse
 from pathlib import Path
+from fractions import Fraction
 import mpmath as mp
 
 # ---- standardized utilities (provided in utils.py) ----
@@ -64,6 +63,9 @@ def main() -> None:
     ap.add_argument("--json-out", required=False, help="Override JSON output path (optional)")
     args = ap.parse_args()
 
+    # Set working precision early (determinism across environments).
+    mp.mp.dps = 160
+
     # Parse all inputs (supports exact 'p/q' or decimal) → mpf, with fraction preserved if given.
     # ETHOS: no rational guessing from decimals -> reconstruct_if_float=False.
     fpp    = parse_number(args.fpp,    reconstruct_if_float=False)
@@ -86,6 +88,17 @@ def main() -> None:
     half = mp.mpf('1')/2
     p    = chi_tt.float * Gamma.float
     deltaL2 = half * fpp.float * H4_sq.float * (p ** 2)
+
+    # Attempt exact rational propagation ONLY if every input was an exact fraction.
+    deltaL2_rat = None
+    if (fpp.fraction is not None and
+        H4_sq.fraction is not None and
+        chi_tt.fraction is not None and
+        Gamma.fraction is not None):
+        # Exact Fraction arithmetic (no rational guessing).
+        p_frac = chi_tt.fraction * Gamma.fraction
+        delta_frac = Fraction(1, 2) * fpp.fraction * H4_sq.fraction * (p_frac ** 2)
+        deltaL2_rat = f"{delta_frac.numerator}/{delta_frac.denominator}"
 
     # Console ledger
     ledger_header("ΔL^(2) (quadratic correction)")
@@ -111,7 +124,10 @@ def main() -> None:
             "Gamma":  _node(Gamma),
         },
         "outputs": {
-            "deltaL2": {"decimal_48": mp.nstr(deltaL2, 48)}
+            "deltaL2": {
+                **({"rational": deltaL2_rat} if deltaL2_rat is not None else {}),
+                "decimal_48": mp.nstr(deltaL2, 48)
+            }
         },
         "status": {"ok": True}
     }

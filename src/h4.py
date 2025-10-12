@@ -1,4 +1,4 @@
-##!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 h4.py — Spherical quartic moments for the A1g harmonic (exact, upstream derivation)

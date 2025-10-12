@@ -3,52 +3,81 @@
 Deterministic “theoretical experiment” scripts that produce the key
 certificates/constants referenced in the paper.
 
-- No network access required
-- CPU only, fast, fully reproducible
-- Outputs written to `outputs/`
+- No network access required  
+- CPU only, fast, fully reproducible  
+- Outputs written to `outputs/` as JSON (strings for numerics; no Python floats)
 
 ## What this is
-This repo contains a *single-file, reproducible pipeline* that ties together:
-- **TT sector normalization \(\kappa_\infty\)** computed *ab initio* (Bessel-factorized baseline) with an independent **continuum “Route A” cross-check** (TT-complete via symmetry ×6, polar patch around the diagonal, and \(r_0\!\to\!0\) extrapolation).
-- The **Fejér–York lock** that produces the effective length \(L_{\mathrm{eff}}\), the small parameter \(\varepsilon\), reduced mass \(m_r=1/\varepsilon\), and a prediction for \(\alpha^{-1}\) from the same rigidity pipeline.
-- **Rigorous error control:** absolutely convergent expressions, analytic tail/remainder bounds, and guarded quadrature near the \(t_1\!\approx\!0\) singular manifold.
-- **Ablations & diagnostics:** York toggle, parity “what-if”, sensitivity \(d(\alpha^{-1})/dL\), cached vs. computed \(\kappa_\infty\), and convergence/extrapolation scans.
-- **Commutator experiments \(z_\chi\):** projector-based and true low-\(q\) commutator probes that *do not* alter the kinematic York coefficient (used only for diagnostics; CODATA is shown for context rather than as an input).
 
-The goal is to blunt “numerology” critiques by (i) deriving every ingredient from the same \(L_{\mathrm{eff}}\)/rigidity scheme with explicit bounds, and (ii) providing an out-of-sector cross-check (Route A) that shares no discretization artifacts with the baseline.
+This repo contains a **multi-script, reproducible pipeline** that ties together:
 
-## Highlights
-- **One-file run:** No figures, just scalars suitable for the paper’s “Lock Universality and Ablations” section.
-- **Two independent \(\kappa_\infty\) routes:**  
-  - *Baseline:* Bessel-factorized TT integrals.  
-  - *Route A:* Continuum integral with TT completion (×6), polar patch around \(t_2=t_3=0\), and linear \(r_0\)-extrapolation to remove the regulated core.
-- **Fejér–York lock (series-exact):** \(L_0=\log(15/8)\), York increment \(11/1560\), odd/even tails evaluated with absolute convergence and rigorous bounds.
-- **Precision on rails:** Configurable decimal precision for the lock and integrators; all tolerances are finite and guarded (no infinite loops).
-- **Remainder bounds everywhere:** Poisson-summed/series tails and polar-patch contributions carry explicit, printed bounds.
-- **Ablations you can trust:** York toggle, optional parity knob, and first-order \(\Delta L\) needed to match an external target (diagnostic only).
-- **Sensitivity reporting:** Exact \(d(\alpha^{-1})/dL\) at the evaluated \(L_{\mathrm{eff}}\) to translate tiny theory shifts into ppb predictions.
-- **Convergence dashboards:** GL node sweeps, Richardson-style extrapolation for Route A, and slope diagnostics.
-- **Safe near singularities:** Open-interval and polar decompositions plus small-\(r\) analytic limits avoid division-by-zero traps.
-- **Cache or compute:** Use the cached \(\kappa_\infty\) for quick runs or recompute both routes when you want a clean *ab initio* pass.
-- **Transparent \(z_\chi\) probes:** Implements projector and true commutator measurements to *quantify* (not force) any mismatch; by design, York’s kinematic coefficient is unchanged by these probes.
+- The **TT–sector normalization \( \kappa_\infty \)** computed *ab initio* via
+  stabilized Schlömilch/Bessel integrals.
+- The **Fejér–York lock** that produces the effective length \(L_{\mathrm{eff}}\),
+  reduced mass \(m_r=e^{L_{\mathrm{eff}}/m}\), and a prediction for
+  \( \alpha^{-1} = \kappa_\infty m/(e^{2L_{\mathrm{eff}}/m}-1)\).
+- **Explicit error control:** absolutely convergent series/pieces with printed
+  remainder bounds, and bracketed/bisected lock solution.
+- **Ablations/diagnostics:** dyadic gate & isolation at the EL lock, parity and
+  A1g factors assembled from small, auditable scripts.
+
+> Scope note: this minimal repro implements the **baseline Bessel route** for
+> \( \kappa_\infty \). There is **no separate “Route A” continuum cross-check** in
+> this repo, and no commutator \(z_\chi\) experiments.
+
+## Components (src/)
+
+- `xq.py` — **Fejér quarter-FWHM lock** \(K(x_q)=8/15\) via rigorous bisection;
+  emits `x_q`, `L0=log(15/8)`, and derivatives `fpp`, `f3`, `f4`.  
+  *JSON carries high-precision decimal strings only (no float echoes).*
+- `m.py` — **EL-lock isolation + dyadic gate** over odd `m`; reports first `m`
+  that passes: oddness, dyadic richness proxy `ord_m(2) ≥ 18`, and Fejér isolation
+  at `x_q`.
+- `kappa.py` — **TT baseline certificate** for \( \kappa_\infty \) using exact
+  stabilized Bessel kernels with √X tail extrapolation and an internal tail-span
+  bound.
+- `h4.py` — **Exact S² moments** for the cubic \(A_{1g}\) quartic harmonic
+  \(H_4\): ⟨H4²⟩, ⟨H4³⟩, ⟨H4⁴⟩ (Dirichlet moments; rationals + high-precision echoes).
+- `cq.py` — **York–quartic constant**:
+  Monte-Carlo certificate for \(C_{\hat Q}\) constancy and the exact canonical
+  \( C_Q = 11/780 \).
+- `chitt.py` — **Linear-response scale** \( \chi_{TT} = 3\,C_Q \) (exact-fraction aware).
+- `j2.py` — **Quarter-hop Jacobian²** certificate at mid-edge: emits `J2 = 4/3`
+  (with small surgical checks; JSON carries the rational).
+- `zparity.py` — **Parity factor** \( \zeta_{\text{parity}} = 8\,\mathbb{E}[u_x^2 u_y^2 u_z^2] \)
+  via separated mp.mpf quadratures (reconstructs `1/105` → `8/105`).
+- `edge_parity.py` — **Mid-edge parity/Jacobian quotient** \( \gamma_{\text{edge}}=15/16 \)
+  from \((\mathbb{Z}_2)^4\) character projection; also reports the Fejér lock condition
+  \(K(x_q)=8/15\) from curvature–half-power matching.
+- `num_orbits.py` — **“Five equal mid-edge sectors”**: enumerate 12 edge directions,
+  collapse to 6 antipodal classes, and group into 5 parity sectors (canonical paper
+  partition).
+- `zdir.py` — **Main-lobe share from lock**:
+  \( \zeta_{\text{dir}} = (3/5)\,R \), \( \zeta_{\text{wedge}} = \zeta_{\text{dir}}/N \)
+  for lock ratio \(R\) (e.g. `8/15`) and sector count `N` (e.g. `5`).
+- `gamma.py` — **Unified mid-edge amplitude**  
+  \( \Gamma = \zeta_{\text{parity}} \cdot J_2 \cdot \zeta_{\text{dir}} \cdot C_{A1g} \)  
+  (CLI-only product; exact reconstruction when possible).
+- `dL2.py` — **Quadratic correction**  
+  \( \Delta L^{(2)} = \tfrac12 f''(x_q)\,\langle H_4^2\rangle\,(\chi_{TT}\Gamma)^2 \).
+- `alpha.py` — **Final assembly** of \(L_{\mathrm{eff}}\), \(m_r=e^{L_{\mathrm{eff}}/m}\),
+  and \( \alpha^{-1} \); propagates Fejér-series remainders and a supplied absolute
+  \( \delta\kappa \) into errors.
+- `a1g_xi_tt.py` — Small A1g/normalization helper used in the amplitude chain
+  (emits the A1g projection coefficient consumed by `gamma.py`).
+- `hypothesis.py` — Lock-ratio helper (e.g. provides `R = 8/15` for `zdir.py`).
+- `utils.py` — Shared helpers: CLI parsing (`parse_number`), JSON writers, ledger
+  printing, rational reconstruction, deterministic output filenames, etc.
 
 ## Requirements
-- Python **3.11** (recommended)
-- Packages pinned in `requirements.txt` (e.g. `mpmath`)
+
+- Python **3.11** recommended  
+- `mpmath` (and any other packages listed in `requirements.txt`)
 
 Install once:
 
 ```bash
 python -m pip install -r requirements.txt
-```
-
-## Quick start (Windows PowerShell)
-
-```powershell
-python -m venv .venv
-. .\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-.\run_all.cmd
 ```
 
 ## Quick start (macOS / Linux)
@@ -58,50 +87,72 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 
-# Manual sequence (same as run_all.cmd)
-python run.py xq.py --force
-python run.py m.py  --force    # run.py passes --xq from xq.py into m.py
-python run.py kappa.py --force
-python run.py a1g.py  --force
-python run.py alpha.py --force
+# 1) Lock & curvature
+python src/xq.py --auto-bracket --dps 80
+
+# 2) Dyadic/isolation gate (pass the x_q decimal from outputs/xq.json)
+python src/m.py --xq "<x_q_decimal>"
+
+# 3) Core scalars
+python src/h4.py
+python src/cq.py
+python src/chitt.py
+python src/j2.py
+python src/zparity.py
+python src/edge_parity.py
+python src/num_orbits.py
+python src/zdir.py --lock-ratio 8/15 --num-sectors 5
+python src/gamma.py --z-parity 8/105 --j2 4/3 --z-dir 8/25 --c-a1g "<C_A1g>"
+
+# 4) κ∞ and corrections
+python src/kappa.py --chi-tt 11/260 --E-u4 1/5
+python src/dL2.py --fpp "<fpp>" --H4-sq 16/525 --chi-tt 11/260 --Gamma "<Gamma>"
+
+# 5) Final observables (supply J2 or s=√J2, plus H4^3,H4^4 from h4.py)
+python src/alpha.py --m 19 --kappa "<kappa>" --dkappa "<dkappa_abs>"   --x-q "<x_q>" --deltaL2 "<ΔL2>" --Gamma "<Gamma>" --f3 "<f3>" --f4 "<f4>"   --H4-m3 384/125125 --H4-m4 22784/10635625 --J2 4/3
 ```
 
-> Tip: Omit `--force` to re-use cached results in `outputs/`.
+> On Windows PowerShell, activate with `. .\.venv\Scripts\Activate.ps1` and prefix
+> commands with `python` instead of `python3`.
 
 ## Expected checks (sanity)
 
-After a successful run you should see:
+After a successful pass with defaults you should typically see:
 
-- `outputs/m.json`
-  - `"m_first": 19`
-  - Row for `m=19` shows `"ord2": 18`, `"dyadic_pass": true`, `"isolation_pass": true`
-- `outputs/xq.json`
-  - `x_q ≈ 1.3297024653297962…`
-  - `L0 = log(15/8)`
-- `outputs/alpha.json`
-  - `alpha^{-1} ≈ 137.035999176279489…`
-  - Internal uncertainty split consistent with the paper
+- `outputs/m.json` ⇒ `"m_first": 19` (row for `m=19` shows `ord2: 18`,
+  `dyadic_pass: true`, `isolation_pass: true`).
+- `outputs/xq.json` ⇒ `x_q ≈ 1.3297024653…`, `L0 = log(15/8)`,
+  and high-precision decimals for `fpp`, `f3`, `f4` (no float fields).
+- `outputs/kappa.json` ⇒ a stable `κ_∞` value with a printed tail-span bound.
+- `outputs/alpha.json` ⇒ \(m_r\), \( \alpha^{-1} \), and an error breakdown
+  consistent with Fejér tails + \( \delta\kappa \).
 
 ## How things plug together
 
-- `xq.py` computes the EL-lock abscissa `x_q` (Fejér lock).
-- `m.py` **reads `--xq` via utils** and certifies the dyadic gate & isolation at the EL lock.
-- `kappa.py` produces the Schlömilch/Bessel integral certificate `κ∞`.
-- `a1g.py` and companions derive group-theoretic factors used in the master relation.
-- `alpha.py` assembles everything to reproduce the predicted `α^{-1}`.
+- `xq.py` → `x_q`, `L0`, `fpp`, `f3`, `f4`  
+- `m.py`  → validates odd-`m` dyadic/isolation at `x_q`  
+- `h4.py`, `cq.py`, `chitt.py`, `j2.py`, `zparity.py`, `edge_parity.py`,
+  `num_orbits.py`, `zdir.py`, `a1g_xi_tt.py` → small audited factors  
+- `gamma.py` → combines parity/Jacobian/direction/A1g into \( \Gamma \)  
+- `kappa.py` → computes \( \kappa_\infty \) (baseline)  
+- `dL2.py` → quadratic lock correction \( \Delta L^{(2)} \)  
+- `alpha.py` → assembles \(L_{\mathrm{eff}}\), propagates errors, outputs \(m_r\), \( \alpha^{-1} \)
 
-All scripts follow the same CLI contract and shared helpers in `utils.py`.
+All scripts follow the same CLI contract and the shared helpers in `utils.py`.
 
 ## Re-running & cache
 
-Results are cached under `outputs/`. Use `--force` on any `run.py <script> --force`
-invocation to recompute that step from scratch.
+Each script writes its own JSON under `outputs/`. Re-invoke a script to
+regenerate its file; there’s no global cache manager in this minimal repro.
 
 ## Troubleshooting
 
-- **Module not found**: activate the virtual environment (`. .\.venv\Scripts\Activate.ps1` on Windows or `source .venv/bin/activate` on Unix) and reinstall requirements.
-- **Different Python version**: prefer Python 3.11 to match expected numerics and JSON formatting.
+- **Module not found**: activate the venv and (re)install requirements.  
+- **Precision**: raise `--dps` (for `xq.py`) or tighten tolerances if you need finer brackets/series tails.  
+- **Wiring values**: this repo uses CLI plumbing between steps. Read the required
+  fields from the JSON of each step and pass them to the next script.
 
 ## License
 
-See `LICENSE` for code licensing. If a separate data license applies to files in `outputs/`, see the repository notes.
+See `LICENSE` for code licensing. If a separate data license applies to files in
+`outputs/`, see the repository notes.

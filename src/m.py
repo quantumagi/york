@@ -21,7 +21,7 @@ OUTPUT
 """
 
 from __future__ import annotations
-import argparse, math, platform, sys
+import argparse, platform, sys
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import List, Optional, Tuple
@@ -35,39 +35,43 @@ from utils import (
     write_json,        # write_json(Path, dict) -> None
 )
 
-# ---------------- Fejér window & calculus ----------------
+# ---------------- Fejér window & calculus (mpmath-only) ----------------
 
-def sinc(x: float) -> float:
-    """Normalized sinc."""
-    return 1.0 if x == 0.0 else math.sin(x) / x
+def sinc_mpf(x: mp.mpf) -> mp.mpf:
+    """Normalized sinc with mpf (sin x / x), handling x→0 safely."""
+    if x == 0:
+        return mp.mpf('1')
+    return mp.sin(x) / x
 
-def K_fejer(x: float) -> float:
-    """Fejér (power) window K(x) = sinc^2 x."""
-    v = sinc(x)
+def K_fejer(x: mp.mpf) -> mp.mpf:
+    """Fejér (power) window K(x) = sinc^2 x (mpf)."""
+    v = sinc_mpf(x)
     return v * v
 
-def f_prime(x: float) -> float:
+def f_prime(x: mp.mpf) -> mp.mpf:
     r"""f'(x) for f(x) = -log(sinc^2 x) = -2(log sin x - log x) ⇒ f'(x) = -2 cot x + 2/x."""
-    return -2.0 * (math.cos(x) / math.sin(x)) + 2.0 / x
+    return -2 * (mp.cos(x) / mp.sin(x)) + 2 / x
 
-def f_double_prime(x: float) -> float:
+def f_double_prime(x: mp.mpf) -> mp.mpf:
     r"""f''(x) = 2(csc^2 x - x^{-2})."""
-    s = math.sin(x)
-    return 2.0 * (1.0 / (s * s) - 1.0 / (x * x))
+    return 2 * (1 / (mp.sin(x) ** 2) - 1 / (x ** 2))
 
 # ---------------- Isolation check (EL lock x_q) ----------------
 
-def isolation_at_lock(m: int, x_lock: float) -> Tuple[bool, float, float]:
+def isolation_at_lock(m: int, x_lock: mp.mpf) -> Tuple[bool, mp.mpf, mp.mpf]:
     r"""Fejér main-lobe isolation at the EL lock x_q.
         Δ = π/(2m), t = π - Δ.
         Check: L_m := K(t)/K(x_q) ≤ ε_lin := [ f''(x_q) / (2 f'(x_q)) ] Δ^2 .
     """
-    Δ = math.pi / (2 * m)
-    t_side = math.pi - Δ
+    Δ = mp.pi / (2 * m)
+    t_side = mp.pi - Δ
     Lm = K_fejer(t_side) / K_fejer(x_lock)
     fp = f_prime(x_lock)
     fpp = f_double_prime(x_lock)
-    eps_lin = (fpp / (2.0 * fp)) * (Δ * Δ)
+    # guard: require positive denominator (fp>0 at the lock for Fejér); if not, fail isolation
+    if fp <= 0:
+        return (False, Lm, mp.mpf('inf'))
+    eps_lin = (fpp / (2 * fp)) * (Δ ** 2)
     return (Lm <= eps_lin, Lm, eps_lin)
 
 # ---------------- Dyadic microtests ----------------
@@ -110,8 +114,8 @@ class Row:
     dyadic_pass: bool
     ord2: Optional[int]
     N_orbits: int
-    iso_metric_1: float  # L_m
-    iso_metric_2: float  # ε_lin
+    iso_metric_1: str  # L_m  (decimal string)
+    iso_metric_2: str  # ε_lin (decimal string)
     isolation_pass: bool
     all_pass: bool
 
@@ -123,9 +127,12 @@ def main() -> None:
     ap.add_argument("--json-out", type=str, default=None, help="Output JSON path (default: outputs/m.json).")
     args = ap.parse_args()
 
+    # Deterministic precision
+    mp.mp.dps = 120
+
     # Parse x_q via shared utils (mpf; no Python floats)
-    pn_xq = parse_number(args.xq)        # -> object with .float (mpf)
-    x_q = float(pn_xq.float)             # local numeric for math.* calls (internal only)
+    pn_xq = parse_number(args.xq)
+    x_q = pn_xq.float  # mpf
 
     m_min = args.m_min if args.m_min % 2 == 1 else args.m_min + 1
     m_max = args.m_max
@@ -134,16 +141,23 @@ def main() -> None:
     m_first: Optional[int] = None
 
     for m in range(m_min, m_max + 1, 2):
-        odd_ok = True
+        odd_ok = (m % 2 == 1)
         dy_ok, ord2, N_orb = dyadic_proxy_pass(m)
         ok_iso, Lm, eps_lin = isolation_at_lock(m, x_q)
-
         all_ok = odd_ok and dy_ok and ok_iso
+
         rows.append(Row(
-            m=m, odd=odd_ok, dyadic_pass=dy_ok, ord2=ord2, N_orbits=N_orb,
-            iso_metric_1=float(Lm), iso_metric_2=float(eps_lin),
-            isolation_pass=ok_iso, all_pass=all_ok
+            m=m,
+            odd=odd_ok,
+            dyadic_pass=dy_ok,
+            ord2=ord2,
+            N_orbits=N_orb,
+            iso_metric_1=mp.nstr(Lm, 40),
+            iso_metric_2=mp.nstr(eps_lin, 40),
+            isolation_pass=ok_iso,
+            all_pass=all_ok
         ))
+
         if all_ok and m_first is None:
             m_first = m
 
@@ -169,7 +183,7 @@ def main() -> None:
             "isolation_metrics_note": "iso_metric_1, iso_metric_2 are (L_m, ε_lin) at the EL lock.",
         },
         "table": [asdict(r) for r in rows],
-        "outputs": {"m_first": m_first},
+        "outputs": {"m_first": int(m_first)},
         "status": {"ok": True},
     }
 

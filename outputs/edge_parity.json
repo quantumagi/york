@@ -2,10 +2,16 @@
   "intermediates": {
     "group_size": 16,
     "note": "Sum over any nontrivial character is zero by orthogonality; removing that line leaves (|G|-1)/|G|.",
+    "orbifold_cross_check": {
+      "gamma_edge_orbifold": {
+        "decimal": "0.9375",
+        "rational": "15/16"
+      }
+    },
     "sum_chi_odd": 0
   },
   "meta": {
-    "description": "Mid-edge parity/Jacobian \u03b3_edge via (Z\u2082)^4 character projection.",
+    "description": "Mid-edge parity/Jacobian \u03b3_edge via (Z\u2082)^4 character projection; O_h-orbifold cross-check; Fej\u00e9r lock.",
     "ethos": "No inputs; no hard-coded value; exact finite-group derivation.",
     "run_env": {
       "platform": "Windows-10-10.0.19045-SP0",
@@ -20,6 +26,21 @@
       "desc": "Parity/Jacobian factor from mid-edge quotient.",
       "float": 0.9375,
       "rational": "15/16"
+    },
+    "lock_condition": {
+      "derivation": "Curvature-half-power matching: \u03b3_edge \u00d7 K(x_q) = 1/2",
+      "formula": "K(x_q) = (1/2) / \u03b3_edge",
+      "half_power_level": {
+        "decimal": "0.5",
+        "desc": "Fej\u00e9r half-power level for optimal alias suppression",
+        "rational": "1/2"
+      },
+      "k_xq": {
+        "decimal": "0.533333333333333333333333333333333333333333333333333333333333",
+        "desc": "Scalar window K(x_q) at quarter-FWHM lock point",
+        "float": 0.5333333333333333,
+        "rational": "8/15"
+      }
     }
   },
   "status": {

@@ -9,12 +9,6 @@
     "script": "hypothesis.py"
   },
   "outputs": {
-    "lock_ratio": {
-      "den": 15,
-      "desc": "Exact quarter-FWHM lock: sinc^2(x_q)=8/15.",
-      "fraction": "8/15",
-      "num": 8
-    },
     "window": {
       "desc": "Protocol window flag (Fej\u00e9r power window K=sinc^2).",
       "value": "sinc2"
