@@ -1,4 +1,4 @@
-# The Scalar–Singlet Saddle (S³): Minimal Repro
+# The Fejer-York TT Pipeline to α: Minimal Repro
 
 Deterministic “theoretical experiment” scripts that produce the key
 certificates/constants referenced in the paper.
