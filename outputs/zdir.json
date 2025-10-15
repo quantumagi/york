@@ -1,16 +1,12 @@
 {
   "inputs": {
-    "lock_ratio": {
-      "decimal": "0.53333333333333333333333333333333333333333333333333",
-      "rational": "8/15"
-    },
     "num_sectors": {
       "int": 5
     }
   },
   "meta": {
-    "description": "Main-lobe share from lock ratio: \u03b6_dir=(3/5)\u00b7R; \u03b6_wedge=\u03b6_dir/N.",
-    "ethos": "CLI-only; uses protocol lock; no JSON reads; no numerical integration.",
+    "description": "Directional mask from internal 1:4 split; K-independent.",
+    "ethos": "Interface-stable; ignores K(x_q); no numerical integration.",
     "run_env": {
       "platform": "Windows-10-10.0.19045-SP0",
       "python": "3.11.2"
@@ -20,11 +16,11 @@
   },
   "outputs": {
     "z_dir": {
-      "decimal": "0.32",
+      "decimal": "0.32000000000000000666133814775093924254179000854492",
       "rational": "8/25"
     },
     "z_wedge": {
-      "decimal": "0.064",
+      "decimal": "0.064000000000000001332267629550187848508358001708984",
       "rational": "8/125"
     }
   },

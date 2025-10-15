@@ -1,11 +1,52 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-xq.py  — Fejér quarter-FWHM lock and curvature (high-precision, rigorous bisection)
+xq.py
 
-This version uses mpmath everywhere (configurable dps), keeps the lock ratio as an
-exact rational ("8/15"), derives L0 exactly as log(15/8), and emits high-precision
-decimal strings in JSON (alongside legacy floats for backward compatibility).
+ETHOS
+  • Dependency results are only imported from upstream scripts, to avoid
+    circularity, and not hard-coded in this script.
+  • Explicit constants, ratios and formulas are documented, substantiated,
+    and contextually appropriate at the point of usage.
+
+WHAT THIS CERTIFIES
+  Computes the Fejér quarter-FWHM lock x_q and protocol scale L0 with rigorous bounds.
+  • Solves K(x_q) = 8/15 with K(x) = (sin x / x)^2 on (0, π/2) via bracketing bisection.
+  • Emits L0 exactly as log(15/8) and as a high-precision decimal.
+  • Evaluates Fejér curvature derivatives f''(x_q), f‴(x_q), f⁽⁴⁾(x_q) and bounds them
+    over the final bracket interval.
+  • All arithmetic uses mpmath mpf at configurable precision (dps); no JSON reads.
+
+DERIVATION SKETCH (auditor refresher)
+  Define K(x) = sinc^2(x) = (sin x / x)^2 with the standard x→0 extension. On (0, π/2),
+  K is smooth and strictly decreasing, so the equation K(x) = R (R=8/15) has a unique root.
+  We locate x_q by bisection on a user-supplied or auto-discovered bracket [a,b] with
+  g(x)=K(x)−R, and report the midpoint x̂ along with a rigorous error bound ±(b−a)/2.
+  Protocol-exact L0 = log(15/8) follows from the lock ratio. For curvature we use:
+      f(x) = −log K(x) = −2(log sin x − log x)
+      f''(x) = 2(csc^2 x − x^{−2})
+      f‴(x) = −4 csc^2 x·cot x + 4 x^{−3}
+      f⁽⁴⁾(x) = 8 csc^2 x·cot^2 x + 4 csc^4 x − 12 x^{−4}
+  Values are reported at x̂ and bounded by evaluating endpoints {a,b}.
+
+OUTPUTS
+  • outputs.x_q.decimal_48          : high-precision decimal for x_q (midpoint)
+    └ precision.interval            : [a, b] (decimal strings)
+      precision.abs_err_bound       : (b−a)/2
+      precision.method              : "Bisection midpoint ± half-width (rigorous)."
+  • outputs.L0.decimal_48           : high-precision decimal for log(15/8)
+    └ outputs.L0.exact_log_15_over_8: true
+  • outputs.fpp / f3 / f4           : values at x̂ with {min,max} over [a,b]
+  • intermediates                   : final bracket, halfwidth, iterations, K(x̂), residual
+  • meta.run_env / meta.script / mpmath.dps
+
+INPUTS (CLI; all optional, protocol defaults reproduce the paper)
+  --a, --b        : initial bracket endpoints for x_q (mpf strings; default ~ [1.2, 1.5])
+  --abs-tol       : absolute tolerance on x (mpf string; default 1e-30)
+  --rel-tol       : relative tolerance on x (mpf string; default 1e-30)
+  --dps           : mpmath working precision in digits (default 80)
+  --auto-bracket  : if set, scan deterministically to find a valid bracket if the provided one fails
+  --lock-ratio    : target ratio R as fraction string (default "8/15" per protocol)
 """
 
 from __future__ import annotations

@@ -31,7 +31,7 @@ INPUTS
   --sf        (float; scale factor on SE inside abs error bound; default 1.0)
   --scale     (optional; string/float; legacy λ to rescale C_Qhat)
 
-OUTPUT (JSON → outputs/cq.json)
+OUTPUT
   {
     "meta": {...},
     "inputs": {...},

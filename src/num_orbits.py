@@ -3,34 +3,42 @@
 """
 num_orbits.py
 
-PURPOSE
-    Certify the "five mid-edge sectors" statement used by the protocol.
-    We enumerate the 12 cube-edge directions, collapse to 6 antipodal classes,
-    and partition those 6 classes into 5 parity sectors (one sector holds two
-    classes; the other four are singletons). The emitted JSON conforms to the
-    runner schema: outputs.num_orbits.int.
+ETHOS
+  • Dependency results are only imported from upstream scripts, to avoid
+    circularity, and not hard-coded in this script.
+  • Explicit constants, ratios and formulas are documented, substantiated,
+    and contextually appropriate at the point of usage.
 
-MODES
-    MODE=paper_partition      (default)  — emit the canonical 5-sector partition.
-    MODE=derive_from_group    (experimental scaffold) — attempt orbit derivation
-                               via a small generator set; may not give 5 unless
-                               the subgroup matches the protocol exactly.
+WHAT THIS CERTIFIES
+  Certifies the “five mid-edge sectors” statement used by the protocol.
+  • Enumerates the 12 cube-edge directions, collapses to 6 antipodal classes,
+    and partitions those 6 classes into 5 parity sectors (one doubleton + four singletons).
+  • Emits a deterministic JSON payload with num_orbits = 5 in canonical paper mode.
 
-OUTPUT JSON (schema excerpt)
-    {
-      "meta": {...},
-      "outputs": {
-        "num_orbits": { "int": 5, "desc": "Number of parity sectors (mid-edge protocol)." },
-        "orbits": [ {"sector_id": 1, "members": [ ... ]}, ... ]
-      },
-      "intermediates": {
-        "antipodal_edge_classes": [ {"repr":[...], "plane":"xy|yz|zx", "type":"equal|opposite"}, ... ]
-      }
-    }
+DERIVATION SKETCH (auditor refresher)
+  Edge directions are integer triples that are permutations/signs of (±1, ±1, 0).
+  Antipodal classes are formed via exact integer canonicalization: flip signs so the
+  first nonzero coordinate is positive, yielding 6 canonical representatives.
+  Each representative is classified by (plane, type):
+      plane ∈ {xy, yz, zx} based on which coordinate is zero; 
+      type ∈ {equal, opposite} from the sign product of the two nonzero entries.
+  A stable ordering by (plane, type) is applied, then the canonical 5-sector partition is:
+      {xy/equal}, {xy/opposite}, {yz/equal}, {zx/equal}, {yz/opposite, zx/opposite}.
+  (Optional) An experimental “derive_from_group” mode attempts to build sectors from a
+  small generator set; only paper mode is canonical for the protocol.
 
-NOTES
-    • No magic numbers in the body: all permutations/signs are explicit.
-    • Deterministic ordering for reproducible JSON.
+OUTPUTS
+  • outputs.num_orbits.int = 5        (canonical paper mode)
+  • outputs.orbits          = list of sectors with member indices
+  • intermediates.antipodal_edge_classes = [{repr, plane, type}, ...]
+  • meta.run_env, meta.script, notes
+
+INPUTS (CLI / ENV)
+  REQUIRED: none
+  OPTIONAL (not in scripts table)
+    ENV MODE = "paper_partition" (default) | "derive_from_group"
+      – paper_partition: emit canonical 5-sector grouping (protocol)
+      – derive_from_group: experimental scaffold for orbit derivation
 """
 
 from __future__ import annotations

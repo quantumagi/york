@@ -1,22 +1,41 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-j2.py — Quarter-hop Jacobian certificate (mid-edge → sphere), standardized via utils.py.
-
-Emits:
-  outputs.J2.rational = "4/3"
-  status.ok           = True
+j2.py
 
 ETHOS
-  • CLI-only: no JSON reads, no network I/O, no embedded upstream constants.
-  • Deterministic: prints a small console ledger; writes outputs/<script>.json.
+  • Dependency results are only imported from upstream scripts, to avoid
+    circularity, and not hard-coded in this script.
+  • Explicit constants, ratios and formulas are documented, substantiated,
+    and contextually appropriate at the point of usage.
 
-Surgical asserts verify:
-  • edge-choice invariance across the three edge classes,
-  • scale invariance of the tangent metric (g ∝ 1/||k0||^2),
-  • (optional) numeric Jacobian cross-check via Richardson.
+WHAT THIS CERTIFIES
+  Quarter-hop Jacobian^2 at a mid-edge direction on S^2.
+  • Uses the exact differential of F(k) = k/||k|| to derive the tangent metric.
+  • Verifies edge-class invariance and scale invariance of the metric shape.
+  • Emits the exact rational J2 = 4/3 (no floats embedded).
 
-No tunables, no δ→0 limits; exact differential of F(k)=k/||k|| is used.
+DERIVATION SKETCH (auditor refresher)
+  For u = k0/||k0|| at a mid-edge direction (proportional to (1,1,0)):
+    dF(k0)[v] = (I − u u^T) v / ||k0|| .
+  In the canonical edge chart, choose v_edge = e_i − e_j and v_perp = e_k.
+  The induced tangent metric at the chart point satisfies
+      g = [[g11, g12],[g12, g22]] with g11 = 1, g22 = 1/2, g12 = 0,
+  from which the quarter-hop Jacobian^2 evaluates to J2 = 4/3 exactly.
+  (Optional) A Richardson finite-difference check numerically confirms g.
+
+OUTPUTS
+  • outputs.J2.rational = "4/3"
+  • status.ok           = True
+  • intermediates: tangent metric entries (for audit), optional numeric check
+
+INPUTS (CLI)
+  REQUIRED (none)
+  OPTIONAL (not in scripts table)
+    --json-out <path>   Output path (defaults via utils.default_json_out)
+    --numeric           Enable Richardson cross-check (sanity only)
+    --steps <int>       Richardson steps (default: 6)
+    --h0 <float>        Initial step size (default: 2**-8)
 """
 
 from __future__ import annotations

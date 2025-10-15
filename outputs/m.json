@@ -1,14 +1,6 @@
 {
-  "intermediates": {
-    "N_orbits": 18,
-    "isolation_metrics_note": "iso_metric_1, iso_metric_2 are (L_m, \u03b5_lin) at the EL lock.",
-    "x_q": {
-      "decimal": "1.32970246532979619716327",
-      "raw": "1.32970246532979619716327"
-    }
-  },
   "meta": {
-    "notes": "Isolation bound evaluated at EL lock x_q provided via --xq.",
+    "notes": "Single-gate (dyadic richness) scan; ord_m(2) \u2265 18.",
     "platform": "Windows-10-10.0.19045-SP0",
     "python": "3.11.2",
     "script": "m.py"
@@ -21,232 +13,148 @@
   },
   "table": [
     {
-      "N_orbits": 18,
       "all_pass": false,
       "dyadic_pass": false,
-      "iso_metric_1": "0.7599088773175332858290933908112510693834",
-      "iso_metric_2": "1.206177229232148990997116964934221831561",
-      "isolation_pass": true,
       "m": 1,
       "odd": true,
       "ord2": 1
     },
     {
-      "N_orbits": 18,
       "all_pass": false,
       "dyadic_pass": false,
-      "iso_metric_1": "0.0683917989585779957246184051730125962445",
-      "iso_metric_2": "0.1340196921369054434441241072149135368401",
-      "isolation_pass": true,
       "m": 3,
       "odd": true,
       "ord2": 2
     },
     {
-      "N_orbits": 18,
       "all_pass": false,
       "dyadic_pass": false,
-      "iso_metric_1": "0.02239655577025645792129979115241066930896",
-      "iso_metric_2": "0.04824708916928595963988467859736887326243",
-      "isolation_pass": true,
       "m": 5,
       "odd": true,
       "ord2": 4
     },
     {
-      "N_orbits": 18,
       "all_pass": false,
       "dyadic_pass": false,
-      "iso_metric_1": "0.0109096958111718752416366360934085159055",
-      "iso_metric_2": "0.02461586182106426512239014214151473125634",
-      "isolation_pass": true,
       "m": 7,
       "odd": true,
       "ord2": 3
     },
     {
-      "N_orbits": 18,
       "all_pass": false,
       "dyadic_pass": false,
-      "iso_metric_1": "0.006422278787951542078100436033138216212007",
-      "iso_metric_2": "0.0148910769041006048271249008016570596489",
-      "isolation_pass": true,
       "m": 9,
       "odd": true,
       "ord2": 6
     },
     {
-      "N_orbits": 18,
       "all_pass": false,
       "dyadic_pass": false,
-      "iso_metric_1": "0.004222879276908795229791809346763283560952",
-      "iso_metric_2": "0.009968406853158256123943115412679519269097",
-      "isolation_pass": true,
       "m": 11,
       "odd": true,
       "ord2": 10
     },
     {
-      "N_orbits": 18,
       "all_pass": false,
       "dyadic_pass": false,
-      "iso_metric_1": "0.002985428385227987691224850539018578957415",
-      "iso_metric_2": "0.00713714336823756799406578085759894574888",
-      "isolation_pass": true,
       "m": 13,
       "odd": true,
       "ord2": 12
     },
     {
-      "N_orbits": 18,
       "all_pass": false,
       "dyadic_pass": false,
-      "iso_metric_1": "0.002221350917622089967138879504158176923333",
-      "iso_metric_2": "0.005360787685476217737764964288596541473603",
-      "isolation_pass": true,
       "m": 15,
       "odd": true,
       "ord2": 4
     },
     {
-      "N_orbits": 18,
       "all_pass": false,
       "dyadic_pass": false,
-      "iso_metric_1": "0.001716868682866705423544273820156137027505",
-      "iso_metric_2": "0.004173623630561069173000404722955784884293",
-      "isolation_pass": true,
       "m": 17,
       "odd": true,
       "ord2": 8
     },
     {
-      "N_orbits": 18,
       "all_pass": true,
       "dyadic_pass": true,
-      "iso_metric_1": "0.001366495306636787653222344208261386818008",
-      "iso_metric_2": "0.003341211161307891941820268600925822248091",
-      "isolation_pass": true,
       "m": 19,
       "odd": true,
       "ord2": 18
     },
     {
-      "N_orbits": 18,
       "all_pass": false,
       "dyadic_pass": false,
-      "iso_metric_1": "0.001113328806659044657824283772374537561646",
-      "iso_metric_2": "0.002735095757896029458043349126834970139593",
-      "isolation_pass": true,
       "m": 21,
       "odd": true,
       "ord2": 6
     },
     {
-      "N_orbits": 18,
       "all_pass": false,
       "dyadic_pass": false,
-      "iso_metric_1": "0.0009244872300831622772034490924232520319346",
-      "iso_metric_2": "0.002280108183803684293000221105735769057771",
-      "isolation_pass": true,
       "m": 23,
       "odd": true,
       "ord2": 11
     },
     {
-      "N_orbits": 18,
       "all_pass": true,
       "dyadic_pass": true,
-      "iso_metric_1": "0.0007798974999256263492963508754255238327918",
-      "iso_metric_2": "0.001929883566771438385595387143894754930497",
-      "isolation_pass": true,
       "m": 25,
       "odd": true,
       "ord2": 20
     },
     {
-      "N_orbits": 18,
       "all_pass": true,
       "dyadic_pass": true,
-      "iso_metric_1": "0.0006667445908396528861400170469990064118",
-      "iso_metric_2": "0.001654564100455622758569433422406339960989",
-      "isolation_pass": true,
       "m": 27,
       "odd": true,
       "ord2": 18
     },
     {
-      "N_orbits": 18,
       "all_pass": true,
       "dyadic_pass": true,
-      "iso_metric_1": "0.0005765364839022201720105776221880629224833",
-      "iso_metric_2": "0.001434217870668429240186821599208349383544",
-      "isolation_pass": true,
       "m": 29,
       "odd": true,
       "ord2": 28
     },
     {
-      "N_orbits": 18,
       "all_pass": false,
       "dyadic_pass": false,
-      "iso_metric_1": "0.0005034656919913547145637336321500415018784",
-      "iso_metric_2": "0.001255127189627626421433004125842062259689",
-      "isolation_pass": true,
       "m": 31,
       "odd": true,
       "ord2": 5
     },
     {
-      "N_orbits": 18,
       "all_pass": false,
       "dyadic_pass": false,
-      "iso_metric_1": "0.0004434519134568901323632733484886669948254",
-      "iso_metric_2": "0.001107600761462028458215901712519946585455",
-      "isolation_pass": true,
       "m": 33,
       "odd": true,
       "ord2": 10
     },
     {
-      "N_orbits": 18,
       "all_pass": false,
       "dyadic_pass": false,
-      "iso_metric_1": "0.0003935604830758498887668828133494520858607",
-      "iso_metric_2": "0.0009846344728425706048956056856605892502536",
-      "isolation_pass": true,
       "m": 35,
       "odd": true,
       "ord2": 12
     },
     {
-      "N_orbits": 18,
       "all_pass": true,
       "dyadic_pass": true,
-      "iso_metric_1": "0.0003516370443318438755186579432376926176294",
-      "iso_metric_2": "0.0008810644479416720167984784258102423897448",
-      "isolation_pass": true,
       "m": 37,
       "odd": true,
       "ord2": 36
     },
     {
-      "N_orbits": 18,
       "all_pass": false,
       "dyadic_pass": false,
-      "iso_metric_1": "0.0003160712312251968032454106172930268700918",
-      "iso_metric_2": "0.00079301592980417422156286453973321619432",
-      "isolation_pass": true,
       "m": 39,
       "odd": true,
       "ord2": 12
     },
     {
-      "N_orbits": 18,
       "all_pass": true,
       "dyadic_pass": true,
-      "iso_metric_1": "0.0002856398100332160290964644615831668423755",
-      "iso_metric_2": "0.0007175355319643955925027465585569433858184",
-      "isolation_pass": true,
       "m": 41,
       "odd": true,
       "ord2": 20

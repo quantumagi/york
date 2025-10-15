@@ -21,7 +21,7 @@ WHAT THIS CERTIFIES
 INPUTS
   (none — producer script; derives γ_edge by explicit group/character algebra)
 
-DERIVATION (no (a,b))
+DERIVATION NOTES
   1) Mid-edge parity group:
        G ≅ (Z₂)^4 with |G| = 16. Its one–dimensional irreducible characters
        form a group isomorphic to G. Pick any nontrivial character χ_odd.

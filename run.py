@@ -37,7 +37,6 @@ CONFIG = {
     "m.py": {
       "outputs": {"m_first": "outputs.m_first"},
       "inputs": [
-        {"flag": "--xq", "var": "x_q"}          # x_q produced by xq.py (see mapping below)
       ]
     },
 
@@ -82,7 +81,6 @@ CONFIG = {
     "zdir.py": {
       "outputs": {"z_dir": "outputs.z_dir", "z_wedge": "outputs.z_wedge"},
       "inputs": [
-        {"flag": "--lock-ratio", "var": "lock_ratio"},
         {"flag": "--num-sectors", "var": "num_orbits"}
       ]
     },
@@ -105,12 +103,6 @@ CONFIG = {
       "inputs": [
         {"flag": "--C-Q",   "var": "C_Q.rational"}
       ]
-    },
-
-    # ---- A1g projection ----
-    "midedge_blend_ratio_mc.py": {
-      "outputs": {"b_over_a": "outputs.b_over_a", "a": "outputs.a", "b": "outputs.b"},
-      "inputs": []
     },
     
     # ---- Mid-edge parity quotient (derived, producer) ----
@@ -153,12 +145,24 @@ CONFIG = {
       ]
     },
 
-    # ---- κ∞ and observables ----
+    "m4.py": {
+      "outputs": {
+        "M4": "outputs.M4",
+        "Delta_M4_over_3_minus_E": "outputs.Delta_M4_over_3_minus_E",
+        "slope_S": "outputs.slope_S"
+      },
+      "inputs": [
+        {"flag": "--E-u4", "var": "E_u4_frac"},  # from h4.py
+        # optionally pass dps/X-start/rounds/tail-count from your config
+      ]
+    },
+
     "kappa.py": {
       "outputs": {"kappa_infty": "outputs.kappa_infty"},
       "inputs": [
-        {"flag": "--chi-tt", "var": "chi_tt"},          # from chitt.py
-        {"flag": "--E-u4",   "var": "E_u4_frac"}        # from h4.py (intermediates.moments.E_u4)
+        {"flag": "--chi-tt", "var": "chi_tt"},  # from chitt.py (unsigned)
+        {"flag": "--Delta",  "var": "Delta_M4_over_3_minus_E.decimal"},
+        {"flag": "--dDelta", "var": "Delta_M4_over_3_minus_E.bounds.abs", "optional": True}
       ]
     },
 

@@ -29,10 +29,6 @@ OUTPUTS
     • outputs.moment.rational  = "1/105"  (when reconstruction succeeds)
     • outputs.z_parity.rational = "8/105" (when reconstruction succeeds)
     • matching high-precision decimal strings
-
-REFERENCES
-  – Muirhead, Aspects of Multivariate Statistical Theory (Wiley, 1982), Dirichlet moments.
-  – NIST DLMF §26.5 (Dirichlet distribution moments).
 """
 
 from __future__ import annotations
